@@ -1,0 +1,71 @@
+﻿@page "/update-student/{id:int}"
+@using BlazorCrud.Library
+@inject HttpClient http
+@inject NavigationManager navigate
+
+<h3>Update Student</h3>
+
+<EditForm Model="student" OnValidSubmit="UpdateNewStudent">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="container">
+        <div class="mb-3">
+            <label for="Name" class="form-label">Name</label>
+            <input type="text" class="form-control" id="Name" @bind-value="student.Name" placeholder="Enter Your Name">
+        </div>
+
+        <div class="mb-3">
+            <label for="FatherName" class="form-label">Father Name</label>
+            <input type="text" class="form-control" id="FatherName" @bind-value="student.FatherName" placeholder="Enter Your Father Name">
+        </div>
+
+        <div class="mb-3">
+            <label for="RegNo" class="form-label">Reg No</label>
+            <input type="text" class="form-control" id="RegNo" @bind-value="student.RegNo" placeholder="Enter Your Reg No">
+        </div>
+
+        <div class="mb-3">
+            <label for="Address" class="form-label">Address</label>
+            <input type="text" class="form-control" id="Address" @bind-value="student.Address" placeholder="Enter Your Address">
+        </div>
+
+        <div class="mb-3">
+            <label for="Phone" class="form-label">Phone</label>
+            <input type="text" class="form-control" id="Phone" @bind-value="student.Phone" placeholder="Enter Your Phone">
+        </div>
+
+        <div class="mb-3">
+            <label for="Email" class="form-label">Email</label>
+            <input type="text" class="form-control" id="Email" @bind-value="student.Email" placeholder="Enter Your Email">
+        </div>
+
+        <div class="mb-3">
+            <button class="btn btn-success" type="submit">Update</button>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int id { get; set; }
+
+    Student student = new Student();
+
+    protected override async Task OnInitializedAsync()
+    {
+        student = await http.GetFromJsonAsync<Student>($"https://localhost:7179/api/Students/GetStudentById?id={id}");
+
+    }
+
+    private async Task UpdateNewStudent()
+    {
+        var response = await http.PutAsJsonAsync("https://localhost:7179/api/Students/UpdateStudent", student);
+
+        if (response.IsSuccessStatusCode)
+        {
+            Console.WriteLine("Student updated successfully");
+            navigate.NavigateTo("/students-details");
+        }
+    }
+}
